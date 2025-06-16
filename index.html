@@ -3,19 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Caça-Palavras Rural</title>
+    <title>Caça-Palavras Rural e Escola</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="game-container">
-        <h1>Caça-Palavras da Fazenda</h1>
-        <div id="grid" class="grid"></div>
-        <div class="words-to-find">
-            <h2>Palavras para encontrar:</h2>
-            <ul id="word-list"></ul>
-        </div>
-        <div id="message" class="message"></div>
+    <h1>Caça-Palavras: Rural e Escola 🌱📚</h1>
+    <p>Clique nas palavras que encontrar. O professor acompanha ao vivo!</p>
+
+    <div id="studentNameArea">
+        <label>Digite seu nome:</label>
+        <input type="text" id="studentName">
+        <button onclick="startGame()">Começar</button>
     </div>
+
+    <div id="wordGrid"></div>
+
+    <h2>Palavras Encontradas:</h2>
+    <ul id="foundWordsList"></ul>
+
+    <h2>Ranking dos Alunos:</h2>
+    <ul id="ranking"></ul>
+
     <script src="script.js"></script>
 </body>
 </html>

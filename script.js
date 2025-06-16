@@ -1,106 +1,145 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const grid = document.getElementById('grid');
-    const wordList = document.getElementById('word-list');
-    const message = document.getElementById('message');
+let gridSize = 15;
+let grid = [];
+let words = ["ESCOLA", "TRATOR", "PLANTAÇÃO", "ALUNO", "LIVRO", "COLHEITA", "PROFESSOR", "CAMPO", "SOJA", "MILHO", "GADO", "PASTO", "HORTA", "EDUCAÇÃO", "CADERNO"];
+let foundWords = {};
+let currentStudent = "";
 
-    // Palavras e grid personalizado (tema rural)
-    const words = ['TRATOR', 'VACA', 'PLANTIO', 'SOLO', 'AGUA', 'MILHO'];
-    const gridData = [
-        ['T', 'R', 'A', 'T', 'O', 'R', 'X', 'Y', 'Z', 'W'],
-        ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'],
-        ['V', 'A', 'C', 'A', 'K', 'L', 'M', 'N', 'O', 'P'],
-        ['P', 'L', 'A', 'N', 'T', 'I', 'O', 'Q', 'R', 'S'],
-        ['S', 'O', 'L', 'O', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-        ['A', 'G', 'U', 'A', 'B', 'C', 'D', 'E', 'F', 'G'],
-        ['M', 'I', 'L', 'H', 'O', 'T', 'U', 'V', 'W', 'X'],
-        ['X', 'Y', 'Z', 'A', 'B', 'C', 'D', 'E', 'F', 'G']
-    ];
+function createGrid() {
+    grid = Array.from({ length: gridSize }, () => Array(gridSize).fill(""));
+    words.forEach(word => placeWord(word));
+    fillEmptySpaces();
+    renderGrid();
+}
 
-    let selectedCells = [];
-    let foundWords = [];
+function placeWord(word) {
+    let placed = false;
+    while (!placed) {
+        let dir = Math.random() < 0.5 ? "H" : "V";
+        let row = Math.floor(Math.random() * gridSize);
+        let col = Math.floor(Math.random() * gridSize);
 
-    // Cria o grid
-    function createGrid() {
-        grid.innerHTML = '';
-        for (let i = 0; i < gridData.length; i++) {
-            for (let j = 0; j < gridData[i].length; j++) {
-                const cell = document.createElement('div');
-                cell.className = 'cell';
-                cell.textContent = gridData[i][j];
-                cell.dataset.row = i;
-                cell.dataset.col = j;
-                cell.addEventListener('click', () => selectCell(cell));
-                grid.appendChild(cell);
+        if (dir === "H" && col + word.length <= gridSize) {
+            if (grid[row].slice(col, col + word.length).every(c => c === "")) {
+                for (let i = 0; i < word.length; i++) grid[row][col + i] = word[i];
+                placed = true;
+            }
+        } else if (dir === "V" && row + word.length <= gridSize) {
+            if (grid.slice(row, row + word.length).every(r => r[col] === "")) {
+                for (let i = 0; i < word.length; i++) grid[row + i][col] = word[i];
+                placed = true;
             }
         }
     }
+}
 
-    // Cria a lista de palavras
-    function createWordList() {
-        wordList.innerHTML = '';
-        words.forEach(word => {
-            const li = document.createElement('li');
-            li.className = 'word-item';
-            li.textContent = word;
-            li.dataset.word = word;
-            wordList.appendChild(li);
+function fillEmptySpaces() {
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    for (let row = 0; row < gridSize; row++) {
+        for (let col = 0; col < gridSize; col++) {
+            if (grid[row][col] === "") grid[row][col] = letters[Math.floor(Math.random() * letters.length)];
+        }
+    }
+}
+
+function renderGrid() {
+    const gridContainer = document.getElementById("wordGrid");
+    gridContainer.innerHTML = "";
+    grid.forEach((row, rowIndex) => {
+        row.forEach((letter, colIndex) => {
+            let cell = document.createElement("div");
+            cell.classList.add("cell");
+            cell.textContent = letter;
+            cell.dataset.row = rowIndex;
+            cell.dataset.col = colIndex;
+            cell.addEventListener("click", () => cellClicked(rowIndex, colIndex));
+            gridContainer.appendChild(cell);
         });
+    });
+}
+
+function startGame() {
+    currentStudent = document.getElementById("studentName").value.trim();
+    if (currentStudent === "") {
+        alert("Digite seu nome!");
+        return;
     }
-
-    // Seleciona células
-    function selectCell(cell) {
-        if (cell.classList.contains('found')) return;
-
-        cell.classList.toggle('selected');
-        const index = selectedCells.findIndex(c => c === cell);
-        if (index === -1) {
-            selectedCells.push(cell);
-        } else {
-            selectedCells.splice(index, 1);
-        }
-
-        if (selectedCells.length > 1) {
-            checkWord();
-        }
-    }
-
-    // Verifica se as células selecionadas formam uma palavra
-    function checkWord() {
-        const selectedWord = selectedCells.map(cell => cell.textContent).join('');
-        if (words.includes(selectedWord)) {
-            foundWords.push(selectedWord);
-            selectedCells.forEach(cell => {
-                cell.classList.add('found');
-                cell.classList.remove('selected');
-            });
-            updateWordList(selectedWord);
-            message.textContent = `Parabéns! Você encontrou "${selectedWord}"!`;
-            setTimeout(() => {
-                message.textContent = '';
-            }, 2000);
-        } else {
-            message.textContent = 'Tente novamente!';
-            setTimeout(() => {
-                selectedCells.forEach(cell => {
-                    cell.classList.remove('selected');
-                });
-                selectedCells = [];
-                message.textContent = '';
-            }, 1000);
-        }
-    }
-
-    // Atualiza a lista de palavras encontradas
-    function updateWordList(word) {
-        const wordItems = document.querySelectorAll('.word-item');
-        wordItems.forEach(item => {
-            if (item.dataset.word === word) {
-                item.classList.add('found');
-            }
-        });
-    }
-
-    // Inicializa o jogo
+    document.getElementById("studentNameArea").style.display = "none";
     createGrid();
-    createWordList();
-});
+}
+
+function cellClicked(row, col) {
+    let word = getWordFromPosition(row, col);
+    if (word && !foundWords[word]) {
+        foundWords[word] = currentStudent;
+        document.querySelectorAll(".cell").forEach(cell => {
+            if (cell.dataset.word === word) cell.classList.add("found");
+        });
+        updateFoundWords();
+        updateRanking();
+    }
+}
+
+function getWordFromPosition(row, col) {
+    for (let word of words) {
+        // Horizontal check
+        if (col + word.length <= gridSize) {
+            let found = true;
+            for (let i = 0; i < word.length; i++) {
+                if (grid[row][col + i] !== word[i]) {
+                    found = false;
+                    break;
+                }
+            }
+            if (found) markWordCells(row, col, "H", word);
+            if (found) return word;
+        }
+        // Vertical check
+        if (row + word.length <= gridSize) {
+            let found = true;
+            for (let i = 0; i < word.length; i++) {
+                if (grid[row + i][col] !== word[i]) {
+                    found = false;
+                    break;
+                }
+            }
+            if (found) markWordCells(row, col, "V", word);
+            if (found) return word;
+        }
+    }
+    return null;
+}
+
+function markWordCells(row, col, dir, word) {
+    for (let i = 0; i < word.length; i++) {
+        let selector = `.cell[data-row='${dir === "H" ? row : row + i}'][data-col='${dir === "H" ? col + i : col}']`;
+        let cell = document.querySelector(selector);
+        if (cell) cell.dataset.word = word;
+    }
+}
+
+function updateFoundWords() {
+    const list = document.getElementById("foundWordsList");
+    list.innerHTML = "";
+    for (let word in foundWords) {
+        let li = document.createElement("li");
+        li.textContent = `${word} → ${foundWords[word]}`;
+        list.appendChild(li);
+    }
+}
+
+function updateRanking() {
+    let rankingCount = {};
+    for (let word in foundWords) {
+        let student = foundWords[word];
+        rankingCount[student] = (rankingCount[student] || 0) + 1;
+    }
+
+    let rankingList = Object.entries(rankingCount).sort((a, b) => b[1] - a[1]);
+    const rankElement = document.getElementById("ranking");
+    rankElement.innerHTML = "";
+    rankingList.forEach(([student, count]) => {
+        let li = document.createElement("li");
+        li.textContent = `${student}: ${count} palavras`;
+        rankElement.appendChild(li);
+    });
+}

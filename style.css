@@ -1,64 +1,39 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f8ff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-}
-
-.game-container {
     text-align: center;
-    background-color: white;
+    background-color: #f0f8ff;
     padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
-    color: #2e8b57;
-}
-
-.grid {
-    display: inline-grid;
-    grid-template-columns: repeat(10, 40px);
-    gap: 2px;
-    margin: 20px 0;
+#wordGrid {
+    display: grid;
+    grid-template-columns: repeat(15, 30px);
+    gap: 3px;
+    justify-content: center;
+    margin: 20px auto;
 }
 
 .cell {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #e0f7fa;
-    font-size: 18px;
+    border: 1px solid #ccc;
+    padding: 5px;
     cursor: pointer;
     user-select: none;
 }
 
-.cell.selected {
-    background-color: #ffeb3b;
-}
-
 .cell.found {
-    background-color: #a5d6a7;
+    background-color: #90ee90;
+    color: white;
 }
 
-.words-to-find {
-    margin-top: 20px;
-    text-align: left;
+.cell:hover {
+    background-color: #add8e6;
 }
 
-.word-item.found {
-    text-decoration: line-through;
-    color: #2e8b57;
+#studentNameArea {
+    margin-bottom: 20px;
 }
 
-.message {
-    margin-top: 20px;
-    font-weight: bold;
-    color: #d32f2f;
+#foundWordsList, #ranking {
+    list-style-type: none;
+    padding: 0;
 }
